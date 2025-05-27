@@ -1,0 +1,58 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+1. Smarket
+
+```{r}
+library(ISLR)
+head(Smarket)
+?Smarket
+summary(Smarket)
+cor(Smarket[,-9])
+attach(Smarket)
+plot(Volume)
+xtabs(Volume~Year)
+```
+
+2. 
+```{R}
+glm.fits=glm(Direction~Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Smarket, family = binomial)
+summary(glm.fits)
+glm.probs = predict(glm.fits, types = "response")
+glm.probs[1:10]
+```
+3.
+```{R}
+?contrasts(Direction)
+glm.pred=ifelse(glm.probs > 0.5, "Up", "Down")
+table(glm.pred, Direction)
+(507 + 145) / 1250
+mean(glm.pred == Direction)
+```
+
+4. training data.error
+```{R}
+train = (Year < 2005)
+newdata <- Smarket[!train, ]
+Direction.2005 <- Direction[!train]
+glm.fit.train <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Smarket, family = binomial, subset = train)
+summary(glm.fit.train)
+glm.probs.new <- predict(glm.fit.train, newdata, type = "response")
+glm.pred <- ifelse(glm.probs.new > 0.5, "Up", "Down")
+table(glm.pred, Direction.2005)
+error.rate <- mean(glm.pred==Direction.2005)
+error.rate
+```
+
+5. refined model
+```{R}
+glm.fit12 <- glm(Direction ~ Lag1 + Lag2, data = Smarket, family = binomial, subset = train)
+glm.fit12.pred <- predict(glm.fit12, newdata, type = "response")
+glm.fit12.prob <- ifelse(glm.fit12.pred > 0.5, "Up", "Down")
+glm.fit12.prob
+table(glm.fit12.prob, Direction.2005)
+mean(glm.fit12.prob == Direction.2005)
+predict(glm.fit12, newdata = data.frame(Lag1 = c(0, 1.2, 1.5, 2), Lag2=c(0, 1.1, -0.8, -2)), type = "response")
+```
