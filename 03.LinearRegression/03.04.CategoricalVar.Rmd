@@ -1,0 +1,24 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+1. categorical variables
+```{r}
+library(MASS)
+library(ISLR)
+Carseats
+names(Carseats)
+fit <- lm(Sales~., data = Carseats)
+summary(fit)
+```
+2. Categorical Value
+```{r}
+contrasts(Carseats$ShelveLoc)
+contrasts(Carseats$US)
+```
+3. Plot Scatter graph
+```{r}
+pairs(Carseats$Sales~Carseats$Urban)
+```
+
