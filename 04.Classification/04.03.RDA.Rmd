@@ -1,0 +1,21 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(ISLR)
+library(MASS)
+attach(Smarket)
+cor(Lag1, Lag2)
+cov(Lag1, Lag2)
+qda.fit = qda(Direction ~ Lag1 + Lag2, data = Smarket, subset = train)
+qda.fit
+```
+2. QDA predict
+```{R}
+qda.pred <- predict(qda.fit, Smarket.2005)
+qda.pred
+table(qda.pred$class, Smarket.2005$Direction)
+mean(qda.pred$class == Smarket.2005$Direction)
+```
