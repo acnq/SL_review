@@ -1,0 +1,81 @@
+---
+title: "Ridge Regression"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*.
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. 数据预处理
+```{R ISLR}
+library(ISLR)
+set.seed(1)
+hitters = na.omit(Hitters)
+x = model.matrix(Salary ~ ., hitters)[, -1]
+y = hitters$Salary
+z = model.matrix(Salary ~ ., hitters)[, -1]
+```
+
+2. 岭回归 Ridge Regression
+```{R glmnet}
+library(glmnet)
+grid = 10 ^ seq(-2, 10, length=100)
+ridge.mod = glmnet(x, y, alpha = 0, lambda = grid)
+fit.rigde=glmnet(z, y, alpha = 0)
+plot(ridge.mod, xvar = "lambda", label = TRUE)
+plot(fit.rigde, xvar = "lambda", label = TRUE)
+```
+
+3. 解释岭回归 Interpreting Ridge Regression
+```{R}
+ridge.mod$lambda[50] # ell2=50 lambda-11498
+coef(ridge.mod)[, 50]
+fit.rigde$lambda[30]
+coef(fit.rigde)[, 30]
+sqrt(sum(coef(ridge.mod)[-1, 50]^2))
+sqrt(sum(coef(fit.rigde)[-1, 30]^2))
+predict(ridge.mod, s = 50, type = "coefficients") # lambda = 50
+predict(ridge.mod, s = 11498, type = "coefficients")[1:20,] # lambda = 11498
+```
+
+4. ridge regression validation
+```{R}
+set.seed(1)
+train = sample(1:nrow(x), nrow(x) / 2)
+test = (-train)
+y.test = y[test]
+ridge.mod = glmnet(x[train, ], y[train], alpha = 0, lambda = grid)
+ridge.pred = predict(ridge.mod, s = 10, newx = x[test, ]) # lambda = 4
+mean(sum((ridge.pred - y.test)^2))
+```
+
+5. ridge regression vs. lm
+```{R}
+lm(y ~ x, subset = train)
+predict(ridge.mod, s = 10, newx = x[test, ]) # lambda = 0
+```
+
+6. ridge regression cross-validation
+```{R}
+set.seed(1)
+cv.ridge = cv.glmnet(x, y, alpha = 0)
+plot(cv.ridge)
+bestlambda = cv.ridge$lambda.min
+coef(cv.ridge, s = bestlambda)
+ridge.pred = predict(cv.ridge, s = bestlambda, newx = x)
+mean((ridge.pred - y)^2)
+coef(cv.ridge)
+ridge.pred1 = predict(cv.ridge, s = cv.ridge$lambda.1se, newx = x)
+mean((ridge.pred1 - y) ^ 2)
+```
+7. best model
+```{R}
+predict(cv.ridge, type = "coefficients", s = cv.ridge$lambda.1se)[1:20,]
+predict(fit.rigde, type = "coefficients", s = cv.ridge$lambda.1se)[1:20,]
+```

@@ -1,0 +1,59 @@
+---
+title: "LASSO"
+output: html_notebook
+---
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. 数据预处理
+```{r ISLR}
+library(ISLR)
+set.seed(1)
+hitters = na.omit(Hitters)
+x = model.matrix(Salary ~ ., hitters)[, -1]
+y = hitters$Salary
+```
+
+## 2. 构建训练集
+```{r}
+train = sample(1:nrow(x), nrow(x) / 2)
+test = (-train)
+y.test = y[test]
+```
+
+## 3. lasso regression
+```{r glmnet}
+library(glmnet)
+lasso.mod = glmnet(x[train,], y[train], alpha = 1)
+plot(lasso.mod, xvar = "lambda", label = TRUE)
+```
+
+## 4. lasso regression cross validation
+```{r}
+set.seed(1)
+cv.lasso = cv.glmnet(x, y, alpha = 1)
+plot(cv.lasso)
+lasso.coef = coef(cv.lasso)
+lasso.coef[lasso.coef != 0]
+
+bestlambda.out = cv.lasso$lambda.min
+cv.out = cv.glmnet(x[train,], y[train], alpha = 1)
+plot(cv.out)
+bestlambda.out = cv.out$lambda.min 
+
+lasso.pred = predict(lasso.mod, s = bestlambda, newx = x)
+mean((lasso.pred - y) ^ 2)
+
+lasso.pred = predict(lasso.mod, s = bestlambda.out, newx = x[test, ])
+mean((lasso.pred - y.test) ^ 2)
+```
+## 5. best model selection
+```{r}
+lasso.coef = predict(cv.lasso, type = "coefficients", s = bestlambda)[1: 20,]
+lasso.coef # full model
+coef(cv.lasso) # simplest model without 1std
+```
+
