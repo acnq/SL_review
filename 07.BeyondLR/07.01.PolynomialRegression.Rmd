@@ -1,0 +1,58 @@
+---
+title: "7.2 Polymomial Regression"
+output: html_notebook
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1.load data
+```{r}
+library(ISLR)
+summary(Wage)
+head(Wage)
+attach(Wage)
+```
+
+2. polynomial regression
+```{r}
+fit = lm(wage ~ poly(age, 4), data = Wage)
+summary(fit)
+fit2 = lm(wage ~ poly(age, 4, raw = T), data = Wage)
+summary(fit2)
+```
+
+
+3. age prediction
+```{r}
+agelims = range(age)
+age.grid = seq(from = agelims[1], to = agelims[2])
+preds = predict(fit, newdata = list(age = age.grid), se = T)
+se.bands = cbind(preds$fit + 2 * preds$se.fit, preds$fit - 2 * preds$se.fit)
+```
+
+4. plot the prediction
+```{r}
+par(mfrow = c(1, 2), mar = c(4.5, 4.5, 1, 1), oma = c(2, 0, 2, 0)) # mar: margin; oma = outmargin
+plot(age, wage, xlim = agelims, cex = .5, col = "darkgrey") # cex: scale of points
+title("Degree-4 Polynomial ", outer = T) # title for the whole picture
+lines(age.grid, preds$fit, lwd = 2, col = "blue") # lwd: line width
+matlines(age.grid, se.bands, lwd = 1, lty = 4, col = "black") # amtline, matplot, matpoints: plot the col of one matrix againt the cols of another,
+# lty: line-type
+```
+5. ANOVA
+
+```{r}
+fit.1 = lm(wage ~ education + age, data = Wage)
+fit.2 = lm(wage ~ education + poly(age, 2), data = Wage)
+fit.3 = lm(wage ~ education + poly(age, 3), data = Wage)
+fit.4 = lm(wage ~ education + poly(age, 4), data = Wage)
+anova(fit.1, fit.2, fit.3, fit.4)
+summary(fit.3)
+```
+```{r}
+detach(Wage)
+```
+
