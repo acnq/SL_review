@@ -1,0 +1,69 @@
+---
+title: "8.1. Fitting Classification Trees"
+output: html_notebook
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Load the dataset
+```{r}
+library(ISLR)
+library(tree)
+attach(Carseats)
+head(Carseats)
+summary(Carseats)
+```
+# 2.Create Classification of Sales
+
+```{r}
+High=ifelse(Sales<8, "No", "Yes")
+High = as.factor(High) # 这一步必须有
+Carseats_New=data.frame(Carseats,High)
+```
+
+# 3. Decision Tree
+```{r}
+tree.carseats = tree(High~.-Sales, Carseats_New)
+tree.carseats
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats, cex = 0.8)
+```
+
+# 4. Decision Tree for Prediction
+```{r}
+set.seed(2)
+train = sample(1:nrow(Carseats), 200)
+Carseats_New.test = Carseats_New[-train, ]
+High.test = High[- train]
+Carseats_New.train = tree(High~.-Sales, Carseats_New, subset = train)
+Carseats_New.pred = predict(Carseats_New.train, Carseats_New.test, type ="class")
+table(Carseats_New.pred, High.test)
+```
+# 5. cv decision tree
+```{r}
+set.seed(2)
+cv.carseats = cv.tree(Carseats_New.train, FUN = prune.misclass)
+cv.carseats
+plot(cv.carseats$size, cv.carseats$dev, type = "b")
+```
+
+# 6. Prune the Tree with Best Tree Size
+```{r}
+prune.carseats = prune.misclass(tree.carseats, best = 5)
+plot(prune.carseats)
+text(prune.carseats, pretty = 0)
+```
+# 7. Prediction rate with Vest Tree Size
+```{r}
+tree.pred = predict(prune.carseats, Carseats_New.test, type = "class")
+table(tree.pred, High.test)
+```
+
+```{r}
+detach(Carseats)
+```
+

@@ -1,0 +1,55 @@
+---
+title: "08.02. Fitting Regression Trees"
+output: html_notebook
+---
+
+# 1. data preparation
+
+```{r}
+library(tree)
+library(MASS)
+attach(Boston)
+head(Boston)
+summary(Boston)
+?Boston
+```
+
+# 2. Training Dataset
+```{r}
+set.seed(2)
+dim(Boston)
+train = sample(1:nrow(Boston), 300)
+boston.train = Boston[train, ]
+boston.test = Boston[-train, ]
+medv.test = medv[-train]
+```
+# 3. Decision Tree for Training Dataset
+```{r}
+tree.boston = tree(medv~., Boston, subset = train)
+summary(tree.boston)
+plot(tree.boston)
+text(tree.boston)
+```
+# 4. Prediction error
+```{r}
+tree.train.error = predict(tree.boston, newdata = boston.test)
+mean((tree.train.error - medv.test) ^ 2)
+```
+# 5. cv for prunning the tree
+```{r}
+set.seed(2)
+cv.boston = cv.tree(tree.boston)
+plot(cv.boston$size, cv.boston$dev, type = "b")
+prune.boston = prune.tree(tree.boston, best = 6)
+plot(prune.boston)
+text(prune.boston, pretty = 0)
+```
+# 6. test error for cv.tree
+```{r}
+cv.test.error = predict(prune.boston, newdata = boston.test)
+mean((cv.test.error - medv.test) ^ 2)
+```
+```{r}
+detach(Boston)
+```
+
