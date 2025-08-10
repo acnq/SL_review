@@ -1,0 +1,47 @@
+---
+title: "10.04.Pretrained CNN"
+output: html_notebook
+---
+
+```{r}
+old_path <- Sys.getenv("PATH")
+new_path <- paste(
+  "C:/Users/dell/miniconda3/envs/r-reticulate/Library/bin",
+  "C:/Users/dell/miniconda3/envs/r-reticulate/Scripts",
+  old_path,
+  sep = ";"
+)
+```
+
+# 1. data preparation
+```{r}
+library(keras)
+library(tensorflow)
+library(reticulate)
+use_python("C:/Users/dell/miniconda3/envs/r-reticulate/python.exe")
+py_config()
+img_dir <- "book_images"
+image_names <- list.files(img_dir)
+num_images <- length(image_names)
+```
+
+# 2. data processing
+```{r}
+x <- array(dim = c(num_images, 224, 224, 3))
+for(i in 1:num_images) {
+  img_path <- paste(img_dir, image_names[i], sep = "/")
+  img <- image_load(img_path, target_size = c(224, 224))
+  x[i,,,] <- image_to_array(img)
+}
+x <- imagenet_preprocess_input(x)
+```
+
+# 3. Model Fitting
+```{r}
+model <- application_resnet50(weights = "imagenet")
+summary(model)
+pred <- model %>% predict(x) %>% imagenet_decode_predictions(top = 3)
+names(pred) <- image_names
+print(pred)
+```
+

@@ -1,0 +1,65 @@
+---
+title: "10.1.Single Layer Network"
+output: html_notebook
+---
+```{r}
+old_path <- Sys.getenv("PATH")
+new_path <- paste(
+  "C:/Users/dell/miniconda3/envs/r-reticulate/Library/bin",
+  "C:/Users/dell/miniconda3/envs/r-reticulate/Scripts",
+  old_path,
+  sep = ";"
+)
+Sys.setenv(PATH = new_path)
+```
+
+# 1. data preparation
+```{r}
+library(ISLR2)
+library(reticulate)
+use_python("C:/Users/dell/miniconda3/envs/r-reticulate/python.exe")
+py_config()
+py_run_string("print('hello world')")
+py_run_string("import tensorflow")
+library(keras)
+library(tensorflow)
+hitters <- na.omit(Hitters)
+head(hitters)
+str(hitters)
+summary(hitters)
+```
+
+# 2. Training Dataset
+```{r}
+set.seed(119)
+ntest <- trunc(nrow(hitters) / 3)
+testid <- sample(1:nrow(hitters), ntest)
+```
+
+# 3. lm fitting
+```{r}
+lm.fit <- lm(Salary ~., data = hitters[-testid, ])
+lm.pred <- predict(lm.fit, hitters[testid,])
+with(hitters[testid,], mean(abs(lm.pred - Salary)))
+```
+
+# 4. lasso fitting
+```{r}
+hitters.mat <- model.matrix(Salary ~.-1, data = hitters)
+x <- scale(hitters.mat)
+y <- as.matrix(hitters$Salary)
+library(glmnet)
+cv.lasso <- cv.glmnet(x[testid,], y[testid,], alpha = 1)
+cv.pred <- predict(cv.lasso, x[testid,], s = "lambda.min")
+mean(abs(y[testid] - cv.pred))
+```
+# 5. Neural Network
+```{r}
+model <- keras_model_sequential()
+model %>% layer_dense(units = 50, activation = "relu", input_shape = c(20)) %>% layer_dropout(rate = 0.4) %>% layer_dense(units = 1)
+model %>% compile(loss = "mse", optimizer = optimizer_rmsprop(), metrics = list("mean_absolute_error"))
+model %>% fit(x[-testid,], y[-testid], epochs=1000, batch_size=8, validation_data=list(x[testid,],y[testid]))
+npred <- predict(model, x[testid,])
+mean(abs(npred - y[testid]))
+```
+
