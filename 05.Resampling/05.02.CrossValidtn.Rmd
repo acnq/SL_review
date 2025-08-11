@@ -7,7 +7,7 @@ output: html_notebook
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1. 线性拟合LOOCV
+# 1. 线性拟合LOOCV
 ```{r}
 lm.fit <- lm(mpg ~horsepower, data = Auto)
 summary(lm.fit) # rse = 4.906
@@ -18,7 +18,7 @@ library(boot)
 cv.err <- cv.glm(Auto, glm.fit)
 cv.err$delta #rse=4.9225
 ```
-2. K-fold CV
+# 2. K-fold CV
 ```{R}
 cv.err <- function(i){
   cv.err.10 <- rep(0, 10) 

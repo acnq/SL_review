@@ -10,7 +10,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1. train and test samples
+# 1. train and test samples
 ```{r ISLR}
 library(ISLR)
 library(leaps)
@@ -18,7 +18,7 @@ set.seed(1)
 train = sample(seq(263), 200, replace = FALSE) # 1/2
 ```
 
-2. best subset selection on training
+# 2. best subset selection on training
 ```{r}
 # 1. training set
 summary(Hitters)
@@ -28,7 +28,7 @@ regfit.best = regsubsets(Salary ~ ., data = hitters[train,], nvmax = 19)
 summary(regfit.best)
 ```
 
-3. Fit models to test samples
+# 3. Fit models to test samples
 ```{r}
 test.mat = model.matrix(Salary ~ ., data = hitters[-train, ])
 val.errors = rep(NA, 19)
@@ -42,14 +42,14 @@ which.min(val.errors)
 coef(regfit.best, 11)
 ```
 
-4. plot the training and test MSE
+# 4. plot the training and test MSE
 ```{r}
 plot(sqrt(val.errors), ylab = "root MSE", pch = 19, type = "b")
 points(sqrt(regfit.best$rss), col = "blue", pch = 19, type = "b")
 legend("topright", legend = c("Training", "Validation"), col = c("blue", "black"), pch = 19)
 ```
 
-5. predict function of test MSE
+# 5. predict function of test MSE
 ```{r}
 predict.regsubsets = function(object, newdata, id,...){
   form = as.formula(object$call[[2]])
@@ -59,7 +59,7 @@ predict.regsubsets = function(object, newdata, id,...){
 }
 ```
 
-6. cross-validation
+# 6. cross-validation
 ```{r}
 k = 10
 set.seed(105)

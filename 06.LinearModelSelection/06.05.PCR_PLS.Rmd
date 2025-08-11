@@ -10,7 +10,7 @@ PLS: partial least squared (regression)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1. 数据预处理
+# 1. 数据预处理
 ```{r ISLR}
 library(ISLR)
 set.seed(1)
@@ -22,7 +22,7 @@ test = (-train)
 y.test = y[test]
 ```
 
-2. PCR regression
+# 2. PCR regression
 ```{r pls}
 library(pls) # 小写
 set.seed(2)
@@ -33,7 +33,7 @@ validationplot(pcr.fit, val.type = "MSEP")
 
 ```
 
-3. PCA
+# 3. PCA
 ```{r pysch}
 # PCA
 library(psych)
@@ -41,7 +41,7 @@ x = model.matrix(Salary ~ ., hitters)[, -1]
 fa.parallel(x, fa = "pc")
 principal(r = x, nfactors = 6)
 ```
-4. PCR validation
+# 4. PCR validation
 ```{r}
 pcr.pred = predict(pcr.fit, x, ncomp = 1)
 mean((pcr.pred - y) ^ 2)
@@ -49,7 +49,7 @@ pcr.fit = pcr(y ~ x, scale = TRUE, ncomp = 1)
 summary(pcr.fit)
 summary(pcr(Salary ~., data = hitters, scale = TRUE, ncomp = 6))
 ```
-5. PLS regression
+# 5. PLS regression
 ```{r}
 pls.fit = plsr(Salary ~ ., data = hitters, scale=T, validation = "CV")
 summary(pls.fit)

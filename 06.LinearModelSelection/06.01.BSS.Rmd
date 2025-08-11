@@ -9,14 +9,14 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1. load dataset
+# 1. load dataset
 ```{r}
 library(ISLR)
 summary(Hitters)
 is.na(Hitters)
 hitters = na.omit(Hitters)
 ```
-2. Computing Subset
+# 2. Computing Subset
 ```{r}
 # install.packages(leaps)
 library(leaps)
@@ -25,14 +25,14 @@ summary(regfit.full)
 regfit1.full = regsubsets(Salary ~ ., hitters, nvmax = 19)
 summary(regfit1.full)
 ```
-3. subset selection
+# 3. subset selection
 ```{r}
 sum.regfit.full = summary(regfit1.full)
 names(sum.regfit.full)
 sum.regfit.full$rss
 sum.regfit.full$bic
 ```
-4. Plot the RSS
+# 4. Plot the RSS
 ```{r}
 par(mfrow=c(2,2))
 plot.new()
@@ -46,8 +46,7 @@ coef(regfit1.full,6)
 coef(regfit1.full,11)
 ```
 
-5. Plot the Subset in one plot
-
+# 5. Plot the Subset in one plot
 ```{r}
 plot(regfit1.full, scale = "r2")
 plot(regfit1.full, scale = "adjr2")
@@ -55,8 +54,7 @@ plot(regfit1.full, scale = "Cp")
 plot(regfit1.full, scale = "bic")
 coef(regfit1.full, 6)
 ```
-6. Forward Stepwise Selection
-
+# 6. Forward Stepwise Selection
 ```{r}
 regfit1.fwd = regsubsets(Salary ~ ., hitters, nvmax = 19, method = "forward")
 summary(regfit1.fwd)

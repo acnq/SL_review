@@ -8,20 +8,20 @@ output: html_notebook
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1. 测试全集
+# 1. 测试全集
 ```{R}
 library("ISLR")
 summary(Auto)
 lm.fit <- lm(mpg ~ horsepower, data = Auto)
 summary(lm.fit)
 ```
-2. 测试训练集
+# 2. 测试训练集
 ```{R}
 train = sample(392, 196)
 lm.fit.train <- lm(mpg ~ horsepower, data = Auto, subset = train) #4.904
 ```
 
-3. 拟合测试集
+# 3. 拟合测试集
 ```{R}
 lm.fit.pred <- predict(lm.fit.train, Auto)[-train]
 sse <- sum((Auto$mpg[-train] - lm.fit.pred) ^ 2)
@@ -29,7 +29,7 @@ mse <- sqrt(sse / 194) # 4.848
 mse
 ```
 
-4. 多项式拟合
+# 4. 多项式拟合
 ```{r}
 lm.fit2 <- lm(mpg ~ poly(horsepower, 2), data = Auto)
 summary(lm.fit2) # 4.374

@@ -1,0 +1,198 @@
+---
+title: "10.0. Deep Learning"
+output: html_notebook
+---
+
+# 1. Installation
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+old_path <- Sys.getenv("PATH")
+new_path <- paste(
+  "C:/Users/dell/miniconda3/envs/r-reticulate/Library/bin",
+  "C:/Users/dell/miniconda3/envs/r-reticulate/Scripts",
+  old_path,
+  sep = ";"
+)
+library(keras)
+library(tensorflow)
+library(reticulate)
+use_python("C:/Users/dell/miniconda3/envs/r-reticulate/python.exe")
+py_config()
+```
+
+# 2. load Dataset
+```{r}
+iris <- read.csv(url("http://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"), header = FALSE)
+head(iris)
+dim(iris)
+str(iris)
+```
+
+# 3. Name and Dataframe
+```{r}
+names(iris) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species")
+iris[,5] <- as.factor(iris[,5])
+plot(iris$Petal.Length, iris$Petal.Width, pch=21, col=c("red","green3","blue")[unclass(iris$Species)], xlab="Petal Length", ylab="Petal Width")
+cor(iris$Petal.Length, iris$Petal.Width)
+m <- cor(iris[,1:4])
+library(corrplot)
+corrplot(m)
+```
+
+# 4. Data Process
+```{r}
+iris_mat <-as.matrix(iris[,1:4]) 
+iris_nor <- normalize(iris_mat)
+```
+
+# 5. data_separation
+```{r}
+set.seed(119)
+ind <- sample(2, nrow(iris), replace=TRUE, prob=c(0.67, 0.33))
+iris_train <- iris_nor[ind==1,]
+iris_test <- iris_nor[ind==2,]
+iris_train_y <- as.numeric(iris[ind==1,5])-1
+iris_test_y <- as.numeric(iris[ind==2,5])-1
+```
+
+# 6. One-Hot Encoding
+```{r}
+# One hot encode training target values
+iris_train_Labels <- to_categorical(iris_train_y)
+
+# One hot encode test target values
+iris_test_Labels <- to_categorical(iris_test_y)
+
+# Print out the iris.testLabels to double check the result
+print(iris_test_Labels)
+```
+# 7. neural network with two layers
+```{r}
+# 定义要使用的模型
+model <- keras_model_sequential()
+# 模型定义输入数据(input_shape)为4列,layer_dense为2层，units为每层node数量，activation为每层使用的转换函数。
+model %>% layer_dense(units = 8,activation="relu", input_shape = c(4)) %>% layer_dense(units=3, activation= "softmax")
+
+# Print a summary of a model
+summary(model)
+
+# Get model configuration
+get_config(model)
+
+# Get layer configuration
+get_layer(model, index = 1)
+
+# List the model's layers
+model$layers
+
+# List the input tensors
+model$inputs
+
+# List the output tensors
+model$outputs
+```
+# 8. Compile the Model
+```{r}
+model %>% compile(loss="categorical_crossentropy", optimizer="SGD", metrics="accuracy")
+model %>% fit(iris_train,iris_train_Labels, epochs = 500, batch_size = 5, validation_split = 0.2)
+```
+# 9, Visualize the Model Training History
+```{r}
+history <- model %>% fit(iris_train, iris_train_Labels, epochs = 500, batch_size = 5, validation_split = 0.2)
+plot(history$metrics$loss, main = "Model Loss", xlab = "epoch", ylab = "loss", col="blue", type = "l", ylim = c(0, 1))
+
+lines(history$metrics$val_loss, col = "green")
+
+legend("topright", c("train", "test"), col = c("blue", "green"), lty = c(1, 1))
+
+plot(history$metrics$acc, main = "Model Accuracy", xlab = "epoch", ylab = "accuracy", col = "orange", type = "l", ylim = c(0.5, 1))
+
+lines(history$metrics$val_acc, col = "red")
+
+legend("bottomright", c("train", "test"), col = c("orange", "red"), lty = c(1, 1))
+```
+# 10. Predict New Data
+```{r}
+classes <- model %>% predict(iris_test) %>% k_argmax()
+table(iris_test_y, as.numeric(classes))
+```
+# 11. Evaluation Model
+```{r}
+score <- model %>% evaluate(iris_test, iris_test_Labels, batch_size = 128)
+print(score)
+```
+# 12. Fine-Tuning the Model
+## 12.1. Add Layers
+```{r}
+model1 <- keras_model_sequential()
+
+model1 %>%
+  layer_dense(units = 8, activation = 'relu', input_shape = c(4)) %>%
+  layer_dense(units = 5, activation = 'relu') %>%
+  layer_dense(units = 3, activation = 'softmax')
+
+model1 %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = 'SGD',
+  metrics = 'accuracy'
+)
+
+model1 %>% fit(iris_train, iris_train_Labels, epochs = 500, batch_size = 5, validation_split = 0.2)
+
+score <- model1 %>% evaluate(iris_test, iris_test_Labels, batch_size = 128)
+
+print(score)
+```
+## 12.2. Add Hidden Units
+```{r}
+# Initialize the sequential model
+model2 <- keras_model_sequential()
+
+# Add layers to model
+model2 %>%
+  layer_dense(units = 24, activation = 'relu', input_shape = c(4)) %>%
+  layer_dense(units = 3, activation = 'softmax')
+  
+model2 %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = 'SGD',
+  metrics = 'accuracy'
+)
+
+model2 %>% fit(iris_train, iris_train_Labels, epochs = 500, batch_size = 5, validation_split = 0.2)
+
+score <- model2 %>% evaluate(iris_test, iris_test_Labels, batch_size = 128)
+
+print(score)
+```
+# 12.3. Optimizing Parameters
+
+```{r}
+model3 <- keras_model_sequential()
+
+model3 %>%
+  layer_dense(units = 8, activation = 'relu', input_shape = c(4)) %>%
+  layer_dense(units = 3, activation = 'softmax')
+
+model3 %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = 'adam',
+  metrics = 'accuracy'
+)
+
+model3 %>% fit(iris_train, iris_train_Labels, epochs = 500, batch_size = 5, validation_set = 0.2)
+
+score <- model3 %>% evaluate(iris_test,iris_test_Labels, batch_size = 128)
+
+print(score)
+```
+# 13. Save the Model
+```{r}
+save_model_hdf5(model, "iris_model.h5")
+mode <- load_model_hdf5("iris_model.h5")
+
+json_string <- model_to_json(model)
+model <- model_from_json(json_string)
+```
+

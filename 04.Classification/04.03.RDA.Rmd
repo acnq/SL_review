@@ -12,7 +12,7 @@ cov(Lag1, Lag2)
 qda.fit = qda(Direction ~ Lag1 + Lag2, data = Smarket, subset = train)
 qda.fit
 ```
-2. QDA predict
+# 2. QDA predict
 ```{R}
 qda.pred <- predict(qda.fit, Smarket.2005)
 qda.pred

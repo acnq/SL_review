@@ -8,7 +8,7 @@ output: html_notebook
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1.load data
+# 1.load data
 ```{r}
 library(ISLR)
 summary(Wage)
@@ -16,7 +16,7 @@ head(Wage)
 attach(Wage)
 ```
 
-2. polynomial regression
+# 2. polynomial regression
 ```{r}
 fit = lm(wage ~ poly(age, 4), data = Wage)
 summary(fit)
@@ -25,7 +25,7 @@ summary(fit2)
 ```
 
 
-3. age prediction
+# 3. age prediction
 ```{r}
 agelims = range(age)
 age.grid = seq(from = agelims[1], to = agelims[2])
@@ -33,7 +33,7 @@ preds = predict(fit, newdata = list(age = age.grid), se = T)
 se.bands = cbind(preds$fit + 2 * preds$se.fit, preds$fit - 2 * preds$se.fit)
 ```
 
-4. plot the prediction
+# 4. plot the prediction
 ```{r}
 par(mfrow = c(1, 2), mar = c(4.5, 4.5, 1, 1), oma = c(2, 0, 2, 0)) # mar: margin; oma = outmargin
 plot(age, wage, xlim = agelims, cex = .5, col = "darkgrey") # cex: scale of points
@@ -42,8 +42,7 @@ lines(age.grid, preds$fit, lwd = 2, col = "blue") # lwd: line width
 matlines(age.grid, se.bands, lwd = 1, lty = 4, col = "black") # amtline, matplot, matpoints: plot the col of one matrix againt the cols of another,
 # lty: line-type
 ```
-5. ANOVA
-
+# 5. ANOVA
 ```{r}
 fit.1 = lm(wage ~ education + age, data = Wage)
 fit.2 = lm(wage ~ education + poly(age, 2), data = Wage)

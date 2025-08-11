@@ -12,7 +12,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-1. 数据预处理
+# 1. 数据预处理
 ```{R ISLR}
 library(ISLR)
 set.seed(1)
@@ -22,7 +22,7 @@ y = hitters$Salary
 z = model.matrix(Salary ~ ., hitters)[, -1]
 ```
 
-2. 岭回归 Ridge Regression
+# 2. 岭回归 Ridge Regression
 ```{R glmnet}
 library(glmnet)
 grid = 10 ^ seq(-2, 10, length=100)
@@ -32,7 +32,7 @@ plot(ridge.mod, xvar = "lambda", label = TRUE)
 plot(fit.rigde, xvar = "lambda", label = TRUE)
 ```
 
-3. 解释岭回归 Interpreting Ridge Regression
+# 3. 解释岭回归 Interpreting Ridge Regression
 ```{R}
 ridge.mod$lambda[50] # ell2=50 lambda-11498
 coef(ridge.mod)[, 50]
@@ -44,7 +44,7 @@ predict(ridge.mod, s = 50, type = "coefficients") # lambda = 50
 predict(ridge.mod, s = 11498, type = "coefficients")[1:20,] # lambda = 11498
 ```
 
-4. ridge regression validation
+# 4. ridge regression validation
 ```{R}
 set.seed(1)
 train = sample(1:nrow(x), nrow(x) / 2)
@@ -55,13 +55,13 @@ ridge.pred = predict(ridge.mod, s = 10, newx = x[test, ]) # lambda = 4
 mean(sum((ridge.pred - y.test)^2))
 ```
 
-5. ridge regression vs. lm
+# 5. ridge regression vs. lm
 ```{R}
 lm(y ~ x, subset = train)
 predict(ridge.mod, s = 10, newx = x[test, ]) # lambda = 0
 ```
 
-6. ridge regression cross-validation
+# 6. ridge regression cross-validation
 ```{R}
 set.seed(1)
 cv.ridge = cv.glmnet(x, y, alpha = 0)
@@ -74,7 +74,7 @@ coef(cv.ridge)
 ridge.pred1 = predict(cv.ridge, s = cv.ridge$lambda.1se, newx = x)
 mean((ridge.pred1 - y) ^ 2)
 ```
-7. best model
+# 7. best model
 ```{R}
 predict(cv.ridge, type = "coefficients", s = cv.ridge$lambda.1se)[1:20,]
 predict(fit.rigde, type = "coefficients", s = cv.ridge$lambda.1se)[1:20,]

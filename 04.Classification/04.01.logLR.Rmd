@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-1. Smarket
+# 1. Smarket
 
 ```{r}
 library(ISLR)
@@ -16,14 +16,15 @@ plot(Volume)
 xtabs(Volume~Year)
 ```
 
-2. 
+# 2. 
 ```{R}
 glm.fits=glm(Direction~Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Smarket, family = binomial)
 summary(glm.fits)
 glm.probs = predict(glm.fits, types = "response")
 glm.probs[1:10]
 ```
-3.
+
+# 3.
 ```{R}
 ?contrasts(Direction)
 glm.pred=ifelse(glm.probs > 0.5, "Up", "Down")

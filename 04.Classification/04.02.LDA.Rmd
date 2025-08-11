@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-1. Linear Discriminant Analysis training
+# 1. Linear Discriminant Analysis training
 ```{r}
 library(ISLR)
 library(MASS)
@@ -13,7 +13,7 @@ lda.fit <- lda(Direction ~ Lag1 + Lag2, data = Smarket, subset = train)
 lda.fit
 plot(lda.fit)
 ```
-2. LDA prediction
+# 2. LDA prediction
 ```{R}
 Smarket.2005 <- subset(Smarket, Year==2005)
 lda.pred = predict(lda.fit, Smarket.2005)

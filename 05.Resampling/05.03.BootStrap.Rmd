@@ -7,7 +7,7 @@ output: html_notebook
 knitr::opts_chunk $set(echo = TRUE)
 ```
 
-1. 准备数据集
+# 1. 准备数据集
 ```{r}
 library(ISLR)
 # install.packages("boot")
@@ -19,12 +19,12 @@ xy.fn <- function(data, index) {
 }
 xy.fn(Portfolio, 1:100)
 ```
-2. boot 测试
+# 2. boot 测试
 ```{r}
 xy.fn(Portfolio, 1:100)
 boot(Portfolio, xy.fn, R = 1000)
 ```
-3. 模拟一次 boot
+# 3. 模拟一次 boot
 ```{r}
 xy.fn <- function(data, index) {
   SP = sample(100, index, replace = T);

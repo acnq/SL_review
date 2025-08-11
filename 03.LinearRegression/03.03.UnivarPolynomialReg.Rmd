@@ -3,19 +3,19 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-1. Polynomial Regression
+# 1. Polynomial Regression
 ```{r}
 library(MASS)
 library(ISLR)
 fit <- lm(medv~lstat + I(lstat^2), data=Boston)
 summary(fit)
 ```
-2. Polynomial Plotting
+# 2. Polynomial Plotting
 ```{r}
 plot(Boston$lstat, Boston$medv)
 lines(sort(Boston$lstat), fitted(fit)[order(Boston$lstat)], col="red")
 ```
-3. High-Degree Polynom
+# 3. High-Degree Polynom
 ```{r}
 fit2 <- lm(medv ~ poly(lstat, 7), data = Boston)
 summary(fit2)
